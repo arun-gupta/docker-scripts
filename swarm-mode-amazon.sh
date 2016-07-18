@@ -4,8 +4,8 @@ set -x
 #aws ec2 run-instances --image-id ami-06116566 --count 3 --instance-type t2.micro --key-name arun@couchbase --security-groups swarm-mode
 
 # Get all public and private IP addresses
-publicIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PublicDnsName`
-privateIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PrivateDnsName`
+publicIpList=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PublicDnsName`
+privateIpList=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PrivateDnsName`
 
 # Install experimental Docker
 for node in $publicIpList
