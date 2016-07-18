@@ -1,0 +1,50 @@
+= Drain Node
+
+This script shows how to add a second manager to the cluster.
+
+. Start 4 Amazon instances: `aws ec2 run-instances --image-id ami-06116566 --count 4 --instance-type t2.micro --key-name arun@couchbase --security-groups swarm-mode`
+. Create a 3 node Swarm cluster using link:swarm-mode-amazon.adoc[]. Check the list of active nodes using `docker node ls`:
++
+```
+ID                           HOSTNAME         MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+0yyap69qjg76ol5jbf811d5yz *  ip-172-31-14-33  Accepted    Ready   Active        Leader
+4a8oodtjhg017dr0xxjm2cpr4    ip-172-31-14-35  Accepted    Ready   Active        
+70xqobszyfxsh6ussr38he6f5    ip-172-31-14-34  Accepted    Ready   Active 
+```
++
+It shows all nodes are active with one leader.
++
+. Add 4th node as manager:
++
+```
+ssh -o StrictHostKeyChecking=no -i /Users/arungupta/.ssh/aruncouchbase.pem ubuntu@<public-ip-master2> "docker swarm join --manager --secret mySecret --listen-addr <private-ip-master2>:2377 <private-ip-master1>:2377"
+```
++
+This shows:
++
+```
+Error response from daemon: Your node is in the process of joining the cluster but needs to be accepted by existing cluster member.
+To accept this node into cluster run "docker node accept duiwczeimfrznk9ab7gyi0lfm" in an existing cluster manager. Use "docker info" command to see the current Swarm status of your node.
+```
++
+. Check nodes using `docker node ls`:
++
+```
+ID                           HOSTNAME        MEMBERSHIP  STATUS   AVAILABILITY  MANAGER STATUS
+2xftpki6053v3esg1uh9116hu    ip-172-31-1-44  Accepted    Ready    Active        
+47x45mx43erudzz6lq4xkzmbc *  ip-172-31-1-43  Accepted    Ready    Active        Leader
+d16tvcy99yo8ucqfgckegtzx6    ip-172-31-1-41  Accepted    Ready    Active        
+duiwczeimfrznk9ab7gyi0lfm                    Pending     Unknown  Active        
+```
++
+. Accept the node using `master1`: `docker node accept duiwczeimfrznk9ab7gyi0lfm`
+. Check nodes again using `docker node ls`:
++
+```
+ID                           HOSTNAME        MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+2xftpki6053v3esg1uh9116hu    ip-172-31-1-44  Accepted    Ready   Active        
+47x45mx43erudzz6lq4xkzmbc *  ip-172-31-1-43  Accepted    Ready   Active        Leader
+d16tvcy99yo8ucqfgckegtzx6    ip-172-31-1-41  Accepted    Ready   Active        
+duiwczeimfrznk9ab7gyi0lfm    ip-172-31-1-42  Accepted    Ready   Active        Reachable
+```
+
