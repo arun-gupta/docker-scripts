@@ -3,7 +3,7 @@ set -x
 # Start three Ubuntu instances
 #aws ec2 run-instances --image-id ami-06116566 --count 3 --instance-type t2.micro --key-name arun@couchbase --security-groups swarm-mode
 
-# Get all the public and private IP addresses
+# Get all public and private IP addresses
 publicIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PublicDnsName`
 privateIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PrivateDnsName`
 
@@ -16,7 +16,7 @@ do
 done
 set -x
 
-# Convert the IP addresses into an array
+# Convert IP addresses into an array
 publicIp=($publicIpList)
 privateIp=($privateIpList)
 
