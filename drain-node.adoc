@@ -1,0 +1,95 @@
+= Drain Node
+
+This script shows how to _drain_ a node and bring it back to _active_ state. The _tasks_ on the node are distributed from active -> drain state but not vice versa.
+
+. Create a 3 node cluster using link:swarm-mode-amazon.adoc[]. Check the list of active nodes using `docker node ls`:
++
+```
+ID                           HOSTNAME         MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+0yyap69qjg76ol5jbf811d5yz *  ip-172-31-14-33  Accepted    Ready   Active        Leader
+4a8oodtjhg017dr0xxjm2cpr4    ip-172-31-14-35  Accepted    Ready   Active        
+70xqobszyfxsh6ussr38he6f5    ip-172-31-14-34  Accepted    Ready   Active 
+```
++
+It shows all nodes are active with one leader.
++
+. Run 6 replicas of a service using `docker service create --name wildfly --replicas 6 jboss/wildfly`
+. Check the list of services using `docker service ls`:
++
+```
+ID            NAME     REPLICAS  IMAGE          COMMAND
+1n7h5v6kv3uy  wildfly  6/6       jboss/wildfly  
+```
++
+. Check the list of tasks using `docker service tasks wildfly`:
++
+```
+ID                         NAME       SERVICE  IMAGE          LAST STATE                  DESIRED STATE  NODE
+a2bxufy7l9su1sso77fkga7s8  wildfly.1  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-35
+c26tsffz3n4u5r8qbo3wrpo03  wildfly.2  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-33
+4xb25mk785hxn9pd9sfykrwdp  wildfly.3  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-34
+3wm9txt61ornc3abfna5tv84i  wildfly.4  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-34
+by6o0bhaxe2gwu3dl8rwkn6b2  wildfly.5  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-35
+eoe02mo3alc3dzklux5fqkp7r  wildfly.6  wildfly  jboss/wildfly  Running about a minute ago  Running        ip-172-31-14-33
+```
++
+Containers are evenly distributed across all the nodes. This is because of the default `spread` strategy.
++
+. Drain a node `docker node update --availability drain ip-172-31-14-35`
++
+. Check the list of nodes using `docker node ls`:
++
+```
+ID                           HOSTNAME         MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+0yyap69qjg76ol5jbf811d5yz *  ip-172-31-14-33  Accepted    Ready   Active        Leader
+4a8oodtjhg017dr0xxjm2cpr4    ip-172-31-14-35  Accepted    Ready   Drain         
+70xqobszyfxsh6ussr38he6f5    ip-172-31-14-34  Accepted    Ready   Active        
+```
++
+The node's status is changed accordinly.
++
+. Check the list of services again using `docker service ls`:
++
+```
+ID            NAME     REPLICAS  IMAGE          COMMAND
+1n7h5v6kv3uy  wildfly  6/6       jboss/wildfly  
+```
++
+. Check the list of tasks using `docker service tasks wildfly`:
++
+```
+ID                         NAME       SERVICE  IMAGE          LAST STATE              DESIRED STATE  NODE
+4uvbvmz9v2262u89xu9e2zf8e  wildfly.1  wildfly  jboss/wildfly  Running 49 seconds ago  Running        ip-172-31-14-33
+c26tsffz3n4u5r8qbo3wrpo03  wildfly.2  wildfly  jboss/wildfly  Running 3 minutes ago   Running        ip-172-31-14-33
+4xb25mk785hxn9pd9sfykrwdp  wildfly.3  wildfly  jboss/wildfly  Running 3 minutes ago   Running        ip-172-31-14-34
+3wm9txt61ornc3abfna5tv84i  wildfly.4  wildfly  jboss/wildfly  Running 3 minutes ago   Running        ip-172-31-14-34
+914evxt319vbpc031pvo9yxd1  wildfly.5  wildfly  jboss/wildfly  Running 49 seconds ago  Running        ip-172-31-14-34
+eoe02mo3alc3dzklux5fqkp7r  wildfly.6  wildfly  jboss/wildfly  Running 3 minutes ago   Running        ip-172-31-14-33
+```
++
+Now the containers are distributed across two active nodes.
++
+. Make the node active again using `docker node update --availability active ip-172-31-14-35`.
+. Check the list of nodes using `docker node ls`:
++
+```
+ID                           HOSTNAME         MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+0yyap69qjg76ol5jbf811d5yz *  ip-172-31-14-33  Accepted    Ready   Active        Leader
+4a8oodtjhg017dr0xxjm2cpr4    ip-172-31-14-35  Accepted    Ready   Active        
+70xqobszyfxsh6ussr38he6f5    ip-172-31-14-34  Accepted    Ready   Active        
+```
++
+. Check the list of tasks using `docker service tasks wildfly`:
++
+```
+ID                         NAME       SERVICE  IMAGE          LAST STATE             DESIRED STATE  NODE
+4uvbvmz9v2262u89xu9e2zf8e  wildfly.1  wildfly  jboss/wildfly  Running 2 minutes ago  Running        ip-172-31-14-33
+c26tsffz3n4u5r8qbo3wrpo03  wildfly.2  wildfly  jboss/wildfly  Running 5 minutes ago  Running        ip-172-31-14-33
+4xb25mk785hxn9pd9sfykrwdp  wildfly.3  wildfly  jboss/wildfly  Running 5 minutes ago  Running        ip-172-31-14-34
+3wm9txt61ornc3abfna5tv84i  wildfly.4  wildfly  jboss/wildfly  Running 5 minutes ago  Running        ip-172-31-14-34
+914evxt319vbpc031pvo9yxd1  wildfly.5  wildfly  jboss/wildfly  Running 2 minutes ago  Running        ip-172-31-14-34
+eoe02mo3alc3dzklux5fqkp7r  wildfly.6  wildfly  jboss/wildfly  Running 5 minutes ago  Running        ip-172-31-14-33
+```
++
+The tasks are not redistributed again.
+
