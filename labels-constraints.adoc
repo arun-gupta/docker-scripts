@@ -1,0 +1,19 @@
+= Assign Labels to Docker Daemon and Constraints on Containers
+
+This script can be used to assign _labels_ to Docker daemon. These labels are then later used to run containers with specific _constraints_.
+
+. Assign label to Docker daemon on node with `<public-ip>`:
++
+```
+ssh -i ~/.ssh/aruncouchbase.pem ubuntu@<public-ip> 'sudo sed -i '/#DOCKER_OPTS/c\DOCKER_OPTS="--label=couchbase.mds=index"' /etc/default/docker';
+ssh -i ~/.ssh/aruncouchbase.pem ubuntu@<public-ip> 'sudo restart docker'
+ssh -i ~/.ssh/aruncouchbase.pem ubuntu@<public-ip> 'docker info';
+```
++
+. Run containers with a constraint:
+
+```
+ssh -i ~/.ssh/aruncouchbase.pem ubuntu@<master-public-ip> 'docker service create --name=cb-mds-index --constraint engine.labels.couchbase.mds==index couchbase'
+
+```
+
