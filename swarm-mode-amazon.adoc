@@ -41,6 +41,8 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/aruncouchbase.pem ubuntu@${publicIp[0]
 #Setup Swarm worker
 ssh -o StrictHostKeyChecking=no -i ~/.ssh/aruncouchbase.pem ubuntu@${publicIp[1]} "docker swarm join --secret mySecret ${privateIp[0]}:2377"
 ssh -o StrictHostKeyChecking=no -i ~/.ssh/aruncouchbase.pem ubuntu@${publicIp[2]} "docker swarm join --secret mySecret ${privateIp[0]}:2377"
+
+ssh -o StrictHostKeyChecking=no -i ~/.ssh/aruncouchbase.pem ubuntu@${publicIp[0]} "docker node ls"
 ```
 === Terminate instances
 
