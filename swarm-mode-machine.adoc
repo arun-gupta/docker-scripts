@@ -1,0 +1,28 @@
+= Docker Swarm Mode Cluster on Amazon
+
+This script will create a 3-node (1 manager, 2 worker) Swarm Mode cluster on Amazon.
+
+== Required
+
+. Docker Toolbox
+. Docker 1.12 RC4+
+
+== Script
+
+=== Create Docker Machines
+
+Setup VPC between different machines and then use internal IP address for `--listen-addr` (https://github.com/docker/machine/issues/3590)
+
+. Two managers
+.. `docker-machine create -d virtualbox manager1`
+.. `docker-machine create -d virtualbox manager2`
+. Two workers
+.. `docker-machine create -d virtualbox worker1`
+.. `docker-machine create -d virtualbox worker2`
+
+=== Initialize Swarm on managers
+. `docker-machine ssh manager1 'docker swarm init --secret mySecret --listen-addr <internal-ip>'`
+
+. See the list of nodes: `docker node ls`
+
+. Install experimental Docker:
