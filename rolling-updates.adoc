@@ -1,0 +1,103 @@
+= Rolling Updates
+
+Show rolling update of 6 services from `arungupta/wildfly-app:1` to `arungupta/wildfly-app:2`.
+
+. Create a service with 6 replicas: `docker service create --name wildfly-app --replicas 6 -p 8080:8080 arungupta/wildfly-app:1`
+. Check service using `docker service ls`
++
+```
+ID            NAME         REPLICAS  IMAGE                    COMMAND
+3dsliqsjh5y2  wildfly-app  6/6       arungupta/wildfly-app:1  
+```
++
+All services are using `arungupta/wildfly-app:1`.
++
+. Check tasks using `docker service tasks wildfly-app`:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE           DESIRED STATE  NODE
+24ioasmtd1g0no655qesnnagc  wildfly-app.1  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+1roqbjk8h1z46nuupb81wgjar  wildfly-app.2  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+dc06t7xl4k2vxnucx1vlzc3s3  wildfly-app.3  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+dkyd7ypzfl25vycaorg2h0car  wildfly-app.4  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+a8yjgud48j2zb3na533lseujp  wildfly-app.5  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+9h0h1i7tpusciwgzqi565gzai  wildfly-app.6  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+```
++
+All tasks are using `arungupta/wildfly-app:1`.
++
+. Update our service by replacing 2 tasks at a time, every 10 seconds: `docker service update wildfly-app --image arungupta/wildfly-app:2 --update-parallelism 2 --update-delay 10s`.
++
+.. First update:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE            DESIRED STATE  NODE
+er8tbrsay13g9g6mt9animl8t  wildfly-app.1  wildfly-app  arungupta/wildfly-app:2  Starting 2 hours ago  Running        moby
+ezuugmg4nnxohpzcng47ifi8a  wildfly-app.2  wildfly-app  arungupta/wildfly-app:2  Ready 2 hours ago     Running        moby
+dc06t7xl4k2vxnucx1vlzc3s3  wildfly-app.3  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago   Running        moby
+dkyd7ypzfl25vycaorg2h0car  wildfly-app.4  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago   Running        moby
+a8yjgud48j2zb3na533lseujp  wildfly-app.5  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago   Running        moby
+9h0h1i7tpusciwgzqi565gzai  wildfly-app.6  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago   Running        moby
+```
++
+Two containers are updated to `arungupta/wildfly-app:2`.
++
+.. After ~10 secs:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE           DESIRED STATE  NODE
+er8tbrsay13g9g6mt9animl8t  wildfly-app.1  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+ezuugmg4nnxohpzcng47ifi8a  wildfly-app.2  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+dc06t7xl4k2vxnucx1vlzc3s3  wildfly-app.3  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+dkyd7ypzfl25vycaorg2h0car  wildfly-app.4  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+```
++
+Two more containers running `arungupta/wildlfy-app:1` are terminated.
++
+. New version of the container `arungupta/wildfly-app:2` are launched:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE           DESIRED STATE  NODE
+er8tbrsay13g9g6mt9animl8t  wildfly-app.1  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+ezuugmg4nnxohpzcng47ifi8a  wildfly-app.2  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+dc06t7xl4k2vxnucx1vlzc3s3  wildfly-app.3  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+dkyd7ypzfl25vycaorg2h0car  wildfly-app.4  wildfly-app  arungupta/wildfly-app:1  Running 2 hours ago  Running        moby
+4ss8mghk1z7kmvvdtvbbvrbmc  wildfly-app.5  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+awyb7air1qth6s2i4itamsi5l  wildfly-app.6  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+```
++
+Now four containers with the version `arungupta/wildfly-app:2` are available.
++
+.. After ~10 secs:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE           DESIRED STATE  NODE
+er8tbrsay13g9g6mt9animl8t  wildfly-app.1  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+ezuugmg4nnxohpzcng47ifi8a  wildfly-app.2  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+4ss8mghk1z7kmvvdtvbbvrbmc  wildfly-app.5  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+awyb7air1qth6s2i4itamsi5l  wildfly-app.6  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+```
++
+All containers running `arungupta/wildfly-app:1` are terminated.
++
+.. Last two containers `arungupta/wildfly-app:2` are launched:
++
+```
+ID                         NAME           SERVICE      IMAGE                    LAST STATE           DESIRED STATE  NODE
+er8tbrsay13g9g6mt9animl8t  wildfly-app.1  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+ezuugmg4nnxohpzcng47ifi8a  wildfly-app.2  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+35qnoheuinyw9ti0m0mopigbv  wildfly-app.3  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+blhbhuxuy5psqjupig6sie7o5  wildfly-app.4  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+4ss8mghk1z7kmvvdtvbbvrbmc  wildfly-app.5  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+awyb7air1qth6s2i4itamsi5l  wildfly-app.6  wildfly-app  arungupta/wildfly-app:2  Running 2 hours ago  Running        moby
+```
++
+. Check service using `docker service ls`:
++
+```
+ID            NAME         REPLICAS  IMAGE                    COMMAND
+3dsliqsjh5y2  wildfly-app  6/6       arungupta/wildfly-app:2  
+```
++
+All services are now using `arungupta/wildfly-app:1`.
+
