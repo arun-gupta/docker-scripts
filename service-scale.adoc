@@ -2,35 +2,35 @@
 
 . Start a service:
 
-`docker service create --name wildfly -p 8080:8080 jboss/wildfly`
+    docker service create --name wildfly -p 8080:8080 jboss/wildfly
 
-. Check services using `docker service ls`:
-
+. Check service using `docker service ls`:
++
 ```
 ID            NAME     REPLICAS  IMAGE          COMMAND
 9q80x48peoax  wildfly  1/1       jboss/wildfly  
 ```
-
-. Check tasks using `docker service tasks wildfly`:
-
++
+. Check tasks in service using `docker service tasks wildfly`:
++
 ```
 ID                         NAME       SERVICE  IMAGE          LAST STATE              DESIRED STATE  NODE
 1i8negn36baptrk8go7v3bfz4  wildfly.1  wildfly  jboss/wildfly  Running 59 seconds ago  Running        ip-172-31-8-7
 ```
++
+. Scale service to 6 replicas:
 
-. Scale to 6 replicas:
+    docker service scale wildfly=6`
 
-`docker service scale wildfly=6`
-
-. Check services using `docker service ls`:
-
+. Check service using `docker service ls`:
++
 ```
 ID            NAME     REPLICAS  IMAGE          COMMAND
 9q80x48peoax  wildfly  6/6       jboss/wildfly  
 ```
-
++
 . Check tasks using `docker service tasks wildfly`:
-
++
 ```
 ID                         NAME       SERVICE  IMAGE          LAST STATE              DESIRED STATE  NODE
 1i8negn36baptrk8go7v3bfz4  wildfly.1  wildfly  jboss/wildfly  Running 2 minutes ago   Running        ip-172-31-8-7
