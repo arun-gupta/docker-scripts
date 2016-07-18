@@ -9,9 +9,12 @@ This script will create a 3-node (1 manager, 2 worker) Swarm Mode cluster on Ama
 
 == Script
 
-. Start Ubuntu instance: `aws ec2 run-instances --image-id ami-06116566 --count 3 --instance-type t2.micro --key-name arun@couchbase --security-groups swarm-mode`
-. Install experimental Docker:
-+
+=== Start Ubuntu instance
+
+`aws ec2 run-instances --image-id ami-06116566 --count 3 --instance-type t2.micro --key-name arun@couchbase --security-groups swarm-mode`
+
+=== Install experimental Docker
+
 ```
 publicIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PublicDnsName`
 privateIp=`aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].PrivateDnsName`
@@ -21,7 +24,11 @@ do
     ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$node 'sudo usermod -aG docker ubuntu'
     ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$node 'docker version'
 done
+```
 
+=== Setup Swarm mode
+
+```
 #Setup Swarm manager
 ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$publicIp[0] 'docker swarm init --listen-addr $privateIp[0] --secret mySecret'
 
@@ -29,5 +36,8 @@ ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$publicIp[0] 'docker swarm init --listen-
 ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$publicIp[1] 'docker swarm join --secret mySecret privateIp[0]:2377'
 ssh -i ~/.ssh/aruncouchbase.pem ubuntu@$publicIp[2] 'docker swarm join --secret mySecret privateIp[0]:2377'
 ```
-+
-. Terminate instances: `aws ec2 terminate-instances --instance-ids `aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].InstanceId``
+
+=== Terminate instances
+
+`aws ec2 terminate-instances --instance-ids `aws ec2 describe-instances --filters Name=instance-state-name,Values=running | jq -r .Reservations[].Instances[].InstanceId``
+
