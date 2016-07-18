@@ -37,7 +37,7 @@ d16tvcy99yo8ucqfgckegtzx6    ip-172-31-1-41  Accepted    Ready    Active
 duiwczeimfrznk9ab7gyi0lfm                    Pending     Unknown  Active        
 ```
 +
-. Accept the node using `master1`: `docker node accept duiwczeimfrznk9ab7gyi0lfm`
+. Accept the node using `master1`: `docker node accept duiwczeimfrznk9ab7gyi0lfm`. Alternatively, udpate existing Swarm manager to auto-accept new managers as `docker update swarm --auto-accept manager`.
 . Check nodes again using `docker node ls`:
 +
 ```
