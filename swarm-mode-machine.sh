@@ -23,3 +23,12 @@ docker-machine ssh worker3 docker swarm join $(docker-machine ip manager1):2377 
 #Connect to Swarm
 echo 'eval $(docker-machine env manager1)'
 
+# docker-machine ssh manager1 docker node ls
+#ID                           HOSTNAME  MEMBERSHIP  STATUS  AVAILABILITY  MANAGER STATUS
+#3c8cb7vum10nb1g2nacayeug4    manager3  Accepted    Ready   Active        Reachable
+#5agmss6z60n486ulkqoxb1f3w *  manager1  Accepted    Ready   Active        Leader
+#awlvyg3blqvbiid3xthjevw0i    worker3   Accepted    Ready   Active        
+#dcs7krlylp8ewjt9j460chebr    worker1   Accepted    Ready   Active        
+#ds2fn1axn6ie4qymu0yzzitoh    manager2  Accepted    Ready   Active        Reachable
+#e1oudnt4689inhbc50rmcgljn    worker2   Accepted    Ready   Active        
+
