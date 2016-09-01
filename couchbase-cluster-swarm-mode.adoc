@@ -1,0 +1,7 @@
+= Couchbase Cluster on a Cluster of Docker Engines with Swarm Mode
+
+. Create a cluster of Docker Engines with Swarm Mode as explained in link:swarm-mode-machine.sh[].
+. Create a "`master`" serivce: `docker create service --name couchbase-master --replicas 1 -e TYPE=MASTER arungupta/couchbase`
+. Create a "`worker`" service: `docker create service --name couchbase-master --replicas 3 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master arungupta/couchbase`
+. Rebalance the cluster
+
