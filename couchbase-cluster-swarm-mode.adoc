@@ -1,7 +1,21 @@
-= Couchbase Cluster on a Cluster of Docker Engines with Swarm Mode
+= Couchbase Cluster using Swarm Mode
 
-. Create a cluster of Docker Engines with Swarm Mode as explained in link:swarm-mode-machine.sh[].
-. Create a "`master`" serivce: `docker create service --name couchbase-master --replicas 1 -e TYPE=MASTER arungupta/couchbase`
-. Create a "`worker`" service: `docker create service --name couchbase-master --replicas 3 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master arungupta/couchbase`
+= Single Docker Engine on AWS
+
+. Configure a single Amazon Host using link:docker-ubuntu.adoc[].
+. Initialize Swarm mode: `docker swarm init`
+. Create an overlay network: `docker network create -d overlay couchbase`
+. Create a "`master`" service: `docker service create --name couchbase-master -p 8091:8091 --replicas 1 --network couchbase -e TYPE=MASTER arungupta/couchbase:swarm`
+. Create a "`worker`" service: `docker service create --name couchbase-worker --replicas 1 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master.couchbase --network couchbase arungupta/couchbase:swarm`
+. Optionally, rebalance the cluster
+
+
+== Cluster of Docker Engines (NEEDS DEBUGGING)
+
+. Create a cluster of Docker Engines with Swarm Mode as explained in link:swarm-mode-machine.sh[]. Or it can be provisioned using Docker for AWS.
+. Create a "`master`" serivce: `docker service create --name couchbase-master -p 8091-8093:8091-8093 -p 11210:11210 -p 4369:4369 --replicas 1 -e TYPE=MASTER arungupta/couchbase:swarm`
+. Find `DefaultDNSTarget` in `Outputs` tab and show Couchbase Web Console.
+. Create a "`worker`" service: `docker service create --name couchbase-worker --replicas 3 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master arungupta/couchbase:swarm`
 . Rebalance the cluster
+
 
