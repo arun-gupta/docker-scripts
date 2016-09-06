@@ -1,6 +1,8 @@
 = Setup Docker on Ubuntu Trusty
 
-Want to setup Docker on Ubuntu Trusty (14.04)?
+Easiest way is explained at: https://get.docker.com/.
+
+Want to setup Docker on Ubuntu Trusty (14.04) using a script?
 
 Complete details at: https://docs.docker.com/engine/installation/linux/ubuntulinux/
 
