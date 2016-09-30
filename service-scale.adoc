@@ -20,7 +20,7 @@ ID                         NAME       SERVICE  IMAGE          LAST STATE        
 +
 . Scale service to 6 replicas:
 
-    docker service scale wildfly=6`
+    docker service scale wildfly=6
 
 . Check service using `docker service ls`:
 +
