@@ -9,13 +9,15 @@
 . Create a "`worker`" service: `docker service create --name couchbase-worker --replicas 1 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master.couchbase --network couchbase arungupta/couchbase:swarm`
 . Optionally, rebalance the cluster
 
+== Docker for AWS
 
-== Cluster of Docker Engines (NEEDS DEBUGGING)
-
-. Create a cluster of Docker Engines with Swarm Mode as explained in link:swarm-mode-machine.sh[]. Or it can be provisioned using Docker for AWS.
-. Create a "`master`" serivce: `docker service create --name couchbase-master -p 8091-8093:8091-8093 -p 11210:11210 -p 4369:4369 --replicas 1 -e TYPE=MASTER arungupta/couchbase:swarm`
-. Find `DefaultDNSTarget` in `Outputs` tab and show Couchbase Web Console.
-. Create a "`worker`" service: `docker service create --name couchbase-worker --replicas 3 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master arungupta/couchbase:swarm`
-. Rebalance the cluster
+. Create a cluster of Docker Engines with Swarm Mode using Docker for https://beta.docker.com/docs/deploy/[AWS Cloud Formation template]
+. Find `Master` in `Outputs` tab, get the public IP address of the master, ssh to it using `ssh -i <path-to-ssh-key> docker@<master-ip>`. Exit out of the shell.
+. Create a SSH tunnel: `ssh -NL localhost:2374:/var/run/docker.sock docker@<master-ip> &`
+. `export DOCKER_HOST=localhost:2374`
+. Create overlay network: `docker network create -d overlay couchbase`
+. Create "`master`" service: `docker service create --name couchbase-master -p 8091:8091 --replicas 1 --network couchbase -e TYPE=MASTER arungupta/couchbase:swarm`
+. Create "`worker`" service: `docker service create --name couchbase-worker --replicas 1 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master.couchbase --network couchbase arungupta/couchbase:swarm`
+. Scale the "`worker`" service: `docker service scale couchbase-worker=3`
 
 
