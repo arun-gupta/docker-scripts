@@ -17,6 +17,7 @@
 . `export DOCKER_HOST=localhost:2374`
 . Create overlay network: `docker network create -d overlay couchbase`
 . Create "`master`" service: `docker service create --name couchbase-master -p 8091:8091 --replicas 1 --network couchbase -e TYPE=MASTER arungupta/couchbase:swarm`
+. Access Couchbase Web Console: http://<master-ip>:8091. Use `Administrator` and `password` credentials.
 . Create "`worker`" service: `docker service create --name couchbase-worker --replicas 1 -e TYPE=WORKER -e COUCHBASE_MASTER=couchbase-master.couchbase --network couchbase arungupta/couchbase:swarm`
 . Scale the "`worker`" service: `docker service scale couchbase-worker=3`
 
