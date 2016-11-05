@@ -1,0 +1,11 @@
+version: '2'
+services:
+  couchbase-master:
+    image: arungupta/couchbase:swarm
+    ports:
+      - 8091:8091
+    environment:
+      - TYPE=MASTER
+networks:
+  default:
+    driver: overlay
